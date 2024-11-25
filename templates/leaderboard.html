@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForNation</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #a0e1f2, #e0f7ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  .flag-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .staff {
+    width: 15px;
+    height: 350px;
+    background-color: #333;
+    position: relative;
+    border-radius: 5px;
+    border: 3px solid #222;
+  }
+
+  /* Ground layer (Country Soil) */
+  .ground {
+    width: 100%;
+    height: 20px;
+    background-color: #7a5c3f; /* Brownish color for soil */
+    position: absolute;
+    bottom: 0;
+    z-index: 0;
+  }
+
+  /* Cement base for realism */
+  .cement-base {
+    width: 50px;
+    height: 15px;
+    background-color: #999;
+    position: absolute;
+    bottom: -20px;
+    left: calc(50% - 25px);
+    border-radius: 5px;
+    z-index: 1;
+  }
+
+  .flag {
+    width: 150px;
+    height: 90px;
+    background-size: cover;
+    position: absolute;
+    bottom: 0;
+    cursor: pointer;
+    transition: bottom 0.3s;
+    border: 2px solid #333;
+    border-radius: 4px;
+    transform-origin: left center;
+  }
+
+  #indiaFlag {
+    background-image: url('https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg');
+  }
+
+  /* Fancy waving animation */
+  @keyframes fancyWave {
+    0% {
+      transform: rotate(0deg) scale(1);
+    }
+    25% {
+      transform: rotate(-15deg) scale(1.05);
+    }
+    50% {
+      transform: rotate(10deg) scale(1.03);
+    }
+    75% {
+      transform: rotate(-10deg) scale(1.05);
+    }
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+  }
+  .fancy-wave {
+    animation: fancyWave 1.5s ease-in-out infinite;
+  }
+
+  /* Firework style */
+  .firework {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 200, 50, 0.9);
+    box-shadow: 0 0 10px rgba(255, 200, 50, 1), 0 0 20px rgba(255, 50, 50, 1);
+    animation: explode 0.7s ease-out forwards;
+  }
+
+  /* Firework explosion animation */
+  @keyframes explode {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2.5) translate(-30px, -30px);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="flag-container">
+  <div class="staff">
+    <div class="ground"></div>
+    <div class="cement-base"></div>
+    <div id="indiaFlag" class="flag" draggable="true" ondragstart="dragStart(event)" ondrag="dragFlag(event)" onclick="raiseFlag('india')"></div>
+  </div>
+</div>
+
+<div id="countDisplay">
+  <p>India Flag Raised: <span id="indiaCount">0</span> times</p>
+</div>
+
+<script>
+  let offsetY;
+
+  function dragStart(event) {
+    offsetY = event.clientY - event.target.getBoundingClientRect().top;
+  }
+
+  function dragFlag(event) {
+    const flag = event.target;
+    const staff = flag.parentElement;
+    const staffHeight = staff.clientHeight;
+
+    // Calculate new flag position within staff boundaries
+    let newY = event.clientY - staff.getBoundingClientRect().top - offsetY;
+    if (newY < 0) newY = 0;
+    if (newY > staffHeight - flag.clientHeight) newY = staffHeight - flag.clientHeight;
+
+    // Set the new flag position
+    flag.style.bottom = (staffHeight - newY - flag.clientHeight) + "px";
+
+    // Add fancy wave effect if flag reaches the top
+    if (newY === 0) {
+      flag.classList.add("fancy-wave");
+      createFireworks();
+      raiseFlag('india');  // Update flag count
+    } else {
+      flag.classList.remove("fancy-wave");
+    }
+  }
+
+  // Fireworks function
+  function createFireworks() {
+    const fireworkCount = 20; // Increased number of fireworks per launch
+    for (let i = 0; i < fireworkCount; i++) {
+      const firework = document.createElement('div');
+      firework.className = 'firework';
+      
+      // Randomly position fireworks in the sky area
+      firework.style.left = `${Math.random() * 100}vw`;
+      firework.style.top = `${Math.random() * 30}vh`;
+      
+      // Append to body
+      document.body.appendChild(firework);
+      
+      // Remove firework after animation ends
+      firework.addEventListener('animationend', () => {
+        firework.remove();
+      });
+    }
+  }
+
+  // Function to handle flag-raising
+  function raiseFlag(country) {
+    fetch('/raise_flag', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ country: country })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.count !== undefined) {
+        // Update the display with the new count
+        document.getElementById(country + 'Count').textContent = data.count;
+        alert(data.message); // Show a message that the flag has been raised
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+</script>
+
+</body>
+</html>

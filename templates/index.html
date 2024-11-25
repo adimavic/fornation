@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ForNation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #a0e1f2, #e0f7ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .flag-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .staff {
+      width: 15px;
+      height: 350px;
+      background-color: #333;
+      position: relative;
+      border-radius: 5px;
+      border: 3px solid #222;
+    }
+    .triangle {
+      position: absolute;
+      top: -10px;  /* Adjust position to sit on top of the pole */
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 40px solid #333;  /* Color of the pole */
+      transform: translateX(-50%);
+    }
+
+    .ground {
+      width: 100%;
+      height: 20px;
+      background-color: #7a5c3f;
+      position: absolute;
+      bottom: 0;
+      z-index: 0;
+    }
+
+    .cement-base {
+      width: 50px;
+      height: 15px;
+      background-color: #999;
+      position: absolute;
+      bottom: -20px;
+      left: calc(50% - 25px);
+      border-radius: 5px;
+      z-index: 1;
+    }
+
+    .flag {
+      width: 150px;
+      height: 90px;
+      background-size: cover;
+      position: absolute;
+      bottom: 0;
+      cursor: pointer;
+      transition: bottom 0.3s;
+      border: 2px solid #333;
+      border-radius: 4px;
+      transform-origin: left center;
+    }
+
+    #indiaFlag {
+      background-image: url('https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg');
+    }
+
+    @keyframes fancyWave {
+      0% {
+        transform: rotate(0deg) scale(1);
+      }
+      25% {
+        transform: rotate(-15deg) scale(1.05);
+      }
+      50% {
+        transform: rotate(10deg) scale(1.03);
+      }
+      75% {
+        transform: rotate(-10deg) scale(1.05);
+      }
+      100% {
+        transform: rotate(0deg) scale(1);
+      }
+    }
+
+    .fancy-wave {
+      animation: fancyWave 1.5s ease-in-out infinite;
+    }
+
+    .firework {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 200, 50, 0.9);
+      box-shadow: 0 0 10px rgba(255, 200, 50, 1), 0 0 20px rgba(255, 50, 50, 1);
+      animation: explode 0.7s ease-out forwards;
+    }
+
+    @keyframes explode {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(2.5) translate(-30px, -30px);
+        opacity: 0;
+      }
+    }
+
+    #countDisplay {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 10px 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    #countDisplay p {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #444;
+    }
+
+    #countDisplay span {
+      color: #e74c3c;
+      font-size: 1.4rem;
+    }
+
+    #flagInfo {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+      padding: 15px;
+    }
+    
+    #flagInfo h3 {
+      font-size: 1.5rem;
+      color: #333;
+    }
+    
+    #flagInfo ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    
+    #flagInfo li {
+      font-size: 1.1rem;
+      color: #444;
+      margin: 10px 0;
+    }
+    
+    #flagInfo strong {
+      color: #e74c3c;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="flag-container">
+    <div class="staff">
+      <div class="triangle"></div> <!-- Pointed triangle -->
+      <div class="ground"></div>
+      <div class="cement-base"></div>
+      <div id="indiaFlag" class="flag" draggable="true" ondragstart="dragStart(event)" ondrag="dragFlag(event)"></div>
+    </div>
+  </div>
+
+  <div id="countDisplay">
+    <p>India Flag Raised: <span id="indiaCount">0</span> times</p>
+  </div>
+
+  <div id="flagInfo" style="display: none; padding: 20px; background-color: #fff; margin-top: 60px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+    <h3>Learn About the Indian Flag</h3>
+    <ul>
+      <li><strong>Adopted:</strong> July 22, 1947</li>
+      <li><strong>Colors Represent:</strong> 
+        <ul>
+          <li><strong>Saffron:</strong> Courage and sacrifice</li>
+          <li><strong>White:</strong> Truth and peace</li>
+          <li><strong>Green:</strong> Faith and chivalry</li>
+        </ul>
+      </li>
+      <li><strong>Symbol:</strong> The Ashoka Chakra represents the eternal wheel of law and progress</li>
+      <li><strong>First Hoisted:</strong> August 15, 1947</li>
+    </ul>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+  <script>
+    let offsetY;
+    const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    // Listen for 'update_score' event from Flask-SocketIO
+    socket.on('update_score', function(data) {
+      // Update the flag count dynamically for all clients
+      const indiaCount = data.india || 0;  // Default to 0 if no data available
+      document.getElementById('indiaCount').textContent = indiaCount;
+    });
+
+    function dragStart(event) {
+      offsetY = event.clientY - event.target.getBoundingClientRect().top;
+    }
+
+    function dragFlag(event) {
+      const flag = event.target;
+      const staff = flag.parentElement;
+      const staffHeight = staff.clientHeight;
+
+      let newY = event.clientY - staff.getBoundingClientRect().top - offsetY;
+      if (newY < 0) newY = 0;
+      if (newY > staffHeight - flag.clientHeight) newY = staffHeight - flag.clientHeight;
+
+      flag.style.bottom = (staffHeight - newY - flag.clientHeight) + "px";
+
+      if (newY === 0) {
+        flag.classList.add("fancy-wave");
+        createFireworks();
+        raiseFlag('india');
+      } else {
+        flag.classList.remove("fancy-wave");
+      }
+    }
+
+    function createFireworks() {
+      const fireworkCount = 20;
+      for (let i = 0; i < fireworkCount; i++) {
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        firework.style.left = `${Math.random() * 100}vw`;
+        firework.style.top = `${Math.random() * 30}vh`;
+        document.body.appendChild(firework);
+        firework.addEventListener('animationend', () => firework.remove());
+      }
+    }
+
+    let isFlagBeingRaised = false;
+
+    function raiseFlag(country) {
+      if (localStorage.getItem(country + 'FlagRaised') || isFlagBeingRaised) {
+        console.log("Flag already raised for this session or is being raised.");
+        return;
+      }
+    
+      isFlagBeingRaised = true; // Set the flag to prevent repeated triggers.
+    
+      fetch('/raise_flag', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ country: country })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.count !== undefined) {
+          document.getElementById(country + 'Count').textContent = data.count;
+          localStorage.setItem(country + 'FlagRaised', 'true');
+    
+          // Show educational component after flag raising
+          document.getElementById('flagInfo').style.display = 'block';
+        }
+      })
+      .finally(() => {
+        isFlagBeingRaised = false; // Allow flag raising again
+      });
+    }
+  </script>
+</body>
+</html>
