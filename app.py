@@ -1,6 +1,7 @@
 import json
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO, emit
+from textblob import TextBlob
 
 app = Flask(__name__)
 socketio = SocketIO(app)  # Initialize Flask-SocketIO
@@ -29,10 +30,29 @@ def update_flag_count(country):
         return data
 
 
-@app.route('/')
+@app.route("/", methods=["GET", "POST"])
 def index():
-    """Serves the index page."""
-    return render_template('index.html')
+    background_color = "linear-gradient(to bottom, #a0e1f2, #e0f7ff)"
+    sentiment = "neutral"  # Default sentiment
+    
+    if request.method == "POST":
+        user_input = request.form["user_input"]
+        
+        # Analyze the sentiment of the user's input
+        blob = TextBlob(user_input)
+        sentiment_score = blob.sentiment.polarity
+        
+        if sentiment_score > 0:
+            sentiment = "positive"
+            background_color = "lightgreen"  # Positive sentiment
+        elif sentiment_score < 0:
+            sentiment = "negative"
+            background_color = "lightcoral"  # Negative sentiment
+        else:
+            sentiment = "neutral"
+            background_color = "lightgray"  # Neutral sentiment
+
+    return render_template("index.html", background_color=background_color, sentiment=sentiment)
 
 
 @app.route('/raise_flag', methods=['POST'])
