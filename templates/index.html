@@ -178,47 +178,66 @@
 
     /*Chatbot container CSS*/
     .chatbot-container {
-    width: 250px;   /* Reduced width */
-    height: 300px;  /* Reduced height */
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    padding: 10px;  /* Reduced padding */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    bottom: 100px;
-    right: 20px;
-    z-index: 1000;
-}
-
-
-  .chatbot-header {
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 20px;
-  }
-  .chatbot-input {
-      width: 100%;
-      padding: 2px;
-      font-size: 16px;
-      border-radius: 2px;
-      border: 1px solid #ddd;
-  }
-  .chatbot-button {
-      width: 100%;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-  }
-  .chatbot-button:hover {
-      background-color: #45a049;
-  }
+            width: 250px; 
+            height: 300px; 
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .chatbot-header {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .chatbot-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chatbot-message {
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #e0f7ff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .chatbot-input-container {
+            display: flex;
+            gap: 10px;
+        }
+        .chatbot-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .chatbot-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 7px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .chatbot-button:hover {
+            background-color: #0056b3;
+        }
   .sentiment-text {
       margin-top: 20px;
       text-align: center;
@@ -234,15 +253,17 @@
       color: gray;
   }
 
-    footer {
-      background-color: #333;
-      color: #fff;
-      text-align: center;
-      padding: 20px 0;
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-    }
+  footer {
+    background: linear-gradient(to bottom, #4caf50, #2e7d32); /* Gradient resembling grass colors */
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-family: Arial, sans-serif;
+}
+
 
     .footer-links {
       display: flex;
@@ -301,18 +322,22 @@
   </div>
 
   <div class="chatbot-container">
-      <div class="chatbot-header">
-          Sentiment Chatbot
-      </div>
-      <form method="POST">
-          <input class="chatbot-input" type="text" name="user_input" placeholder="Enter your text" required>
-          <button class="chatbot-button" type="submit">Submit</button>
-      </form>
-
-      <div class="sentiment-text {{ sentiment }}">
-          Sentiment: {{ sentiment.capitalize() }}
-      </div>
-  </div>
+    <div class="chatbot-header">
+        Sentiment Chatbot
+    </div>
+    <div id="chatbot-messages" class="chatbot-messages">
+        {% for message in messages %}
+            <div class="chatbot-message">{{ message }}</div>
+        {% endfor %}
+    </div>
+    <form method="POST" class="chatbot-input-container">
+        <input class="chatbot-input" type="text" name="user_input" placeholder="#Name Type your message" required>
+        <button class="chatbot-button" type="submit">Send</button>
+    </form>
+    <div class="sentiment-text {{ sentiment }}">
+        Sentiment: {{ sentiment.capitalize() }}
+    </div>
+</div>
 
   <footer>
     <div class="footer-links">

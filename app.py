@@ -8,9 +8,11 @@ socketio = SocketIO(app)  # Initialize Flask-SocketIO
 from threading import Lock
 lock = Lock()
 
+# Global list to store messages
+messages = []
+
 # File path for flag count storage
 FILE_PATH = 'flag_count.json'
-
 
 def read_flag_count():
     """Reads flag count from JSON file."""
@@ -37,22 +39,25 @@ def index():
     
     if request.method == "POST":
         user_input = request.form["user_input"]
-        
-        # Analyze the sentiment of the user's input
+        messages.append(user_input)  # Store the message
+
+        # Analyze sentiment
         blob = TextBlob(user_input)
         sentiment_score = blob.sentiment.polarity
-        
-        if sentiment_score > 0:
-            sentiment = "positive"
-            background_color = "lightgreen"  # Positive sentiment
-        elif sentiment_score < 0:
-            sentiment = "negative"
-            background_color = "lightcoral"  # Negative sentiment
-        else:
-            sentiment = "neutral"
-            background_color = "lightgray"  # Neutral sentiment
 
-    return render_template("index.html", background_color=background_color, sentiment=sentiment)
+        if sentiment_score > -1:
+            sentiment = "positive"
+            background_color = "linear-gradient(to bottom, #56ab2f, #a8e063)"  # Green gradient
+        else:
+            sentiment = "negative"
+            background_color = "linear-gradient(to bottom, #ff416c, #ff4b2b)"  # Red gradient
+
+    return render_template(
+        "index.html",
+        background_color=background_color,
+        sentiment=sentiment,
+        messages=messages,
+    )
 
 
 @app.route('/raise_flag', methods=['POST'])
