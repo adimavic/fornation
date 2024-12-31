@@ -412,6 +412,7 @@
     function raiseFlag(country) {
       if (localStorage.getItem(country + 'FlagRaised') || isFlagBeingRaised) {
         console.log("Flag already raised for this session or is being raised.");
+        document.getElementById('flagInfo').style.display = 'block';
         return;
       }
     

@@ -45,7 +45,7 @@ def index():
         blob = TextBlob(user_input)
         sentiment_score = blob.sentiment.polarity
 
-        if sentiment_score > -1:
+        if sentiment_score >= 0:
             sentiment = "positive"
             background_color = "linear-gradient(to bottom, #56ab2f, #a8e063)"  # Green gradient
         else:
