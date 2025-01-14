@@ -303,6 +303,7 @@
     </div>
   </div>
 
+
   <div id="countDisplay">
     <p>India Flag Raised: <span id="indiaCount">0</span> times</p>
   </div>
@@ -337,6 +338,11 @@
         <button class="chatbot-button" type="submit">Send</button>
     </form>
     
+</div>
+<div id="certificate-section">
+  <h3>Download Certificate</h3>
+  <button id="download-certificate">Download Certificate</button>
+  <p id="certificate-message" style="color: red; display: none;">Certificate already downloaded.</p>
 </div>
 
   <footer>
@@ -431,5 +437,26 @@
       });
     }
   </script>
+<script>
+  document.getElementById('download-certificate').addEventListener('click', () => {
+      fetch('/download_certificate')
+          .then(response => {
+              if (response.status === 403) {
+                  document.getElementById('certificate-message').style.display = 'block';
+              } else {
+                  response.blob().then(blob => {
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.style.display = 'none';
+                      a.href = url;
+                      a.download = 'certificate.png';
+                      document.body.appendChild(a);
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                  });
+              }
+          });
+  });
+</script>
 </body>
 </html>
