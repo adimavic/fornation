@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Me</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>☕ Support My Work</h1>
+            <p>Enjoying my work? Show your appreciation by buying me a coffee! Every little bit helps. 😊</p>
+        </header>
+
+        <main>
+            <div class="support-form">
+                <label for="amount">Enter Amount (INR):</label>
+                <input type="number" id="amount" name="amount" min="1" step="0.01" placeholder="e.g., 100">
+                <button id="rzp-button">Buy Me a Coffee</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Thank you for your support! ❤️</p>
+            <a href="/">Back to Home</a>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('rzp-button').onclick = async function (e) {
+            e.preventDefault();
+            const amount = document.getElementById('amount').value;
+
+            if (!amount || parseFloat(amount) <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+
+            const response = await fetch('/create-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: amount })
+            });
+            const data = await response.json();
+
+            if (data.error) {
+                alert("Error creating order: " + data.error);
+                return;
+            }
+
+            const rzp = new Razorpay({
+                key: "{{ razorpay_key }}",
+                amount: parseFloat(amount) * 100,
+                currency: "INR",
+                name: "Buy Me a Coffee",
+                description: "Support my work!",
+                order_id: data.order_id,
+                handler: function (response) {
+                    fetch('/payment-success', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature
+                        })
+                    }).then(res => {
+                        if (res.ok) alert("Thank you for your support!");
+                        else alert("Payment verification failed.");
+                    });
+                },
+                theme: { color: "#f8a688" }
+            });
+
+            rzp.open();
+        };
+    </script>
+</body>
+</html>
