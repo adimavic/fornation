@@ -81,6 +81,16 @@
     #indiaFlag {
       background-image: url('https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg');
     }
+    #certificate-section {
+      position: fixed; /* Fix it to a specific corner */
+      top: 20px; /* Adjust the distance from the top */
+      right: 20px; /* Adjust the distance from the right */
+      background-color: rgba(255, 255, 255, 0.9); /* Optional: Add a background for visibility */
+      padding: 10px; /* Optional: Add some padding */
+      border-radius: 8px; /* Optional: Add rounded corners */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+      z-index: 1000; /* Ensure it stays above other elements */
+    }
 
     @keyframes fancyWave {
       0% {
@@ -258,7 +268,8 @@
   footer {
     background: linear-gradient(to bottom, #4caf50, #2e7d32); /* Gradient resembling grass colors */
     color: #fff;
-    padding: 20px;
+    text-align: center;
+    padding: 20px 0;
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -269,9 +280,13 @@
     box-sizing: border-box; /* Ensure padding doesn't affect the layout */
 }
 
-.footer-links {
-    margin-left: 20px; /* Push LinkedIn link slightly inward for spacing */
-}
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 10px;
+    }
 
 .footer-links a {
     color: #fff;
@@ -353,6 +368,10 @@ footer a:hover {
     </form>
     
 </div>
+<div id="certificate-section">
+  <button id="download-certificate">Download Certificate</button>
+  <p id="certificate-message" style="color: rgb(0, 81, 255); display: none;">Certificate already downloaded.</p>
+</div>
 
 <footer>
   <!-- LinkedIn Link -->
@@ -409,7 +428,46 @@ footer a:hover {
         flag.classList.remove("fancy-wave");
       }
     }
+  // Function to scroll the messages container to the bottom
+    function scrollToBottom() {
+      const messagesContainer = document.getElementById("chatbot-messages");
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    window.onload = function() {
+    scrollToBottom(); // Scroll chat messages to the bottom on load
 
+    // Check if the flag is already raised
+    const flag = document.getElementById('flag'); // Replace with the actual flag ID
+    const staff = flag.parentElement;
+    const staffHeight = staff.clientHeight;
+
+    const country = 'india'; // Example for the 'india' flag
+    if (localStorage.getItem(country + 'FlagRaised')) {
+      console.log("Flag already raised for this session.");
+      
+      // Directly position the flag at the raised position
+      flag.style.bottom = (staffHeight - flag.clientHeight) + "px";
+      flag.classList.add("fancy-wave");
+      createFireworks();
+
+      // Show the educational component
+      document.getElementById('flagInfo').style.display = 'block';
+
+      // Disable the button to prevent further interaction
+      const flagButton = document.getElementById(country + 'Button');
+      if (flagButton) {
+        flagButton.disabled = true;
+        flagButton.classList.add('disabled-button');
+        }
+      }
+    };
+
+    // Call the function after form submission (e.g., after a new message is added)
+    const form = document.querySelector('.chatbot-input-container');
+    form.addEventListener('submit', () => {
+      setTimeout(scrollToBottom, 100); // Delay to allow new message to be rendered
+    });
     function createFireworks() {
       const fireworkCount = 20;
       for (let i = 0; i < fireworkCount; i++) {
@@ -428,6 +486,23 @@ footer a:hover {
       if (localStorage.getItem(country + 'FlagRaised') || isFlagBeingRaised) {
         console.log("Flag already raised for this session or is being raised.");
         document.getElementById('flagInfo').style.display = 'block';
+        // Get the flag element and staff container
+        const flag = document.getElementById('flag'); // Replace with actual flag ID
+        const staff = flag.parentElement;
+        const staffHeight = staff.clientHeight;
+        
+        // Directly raise the flag to the top if already raised
+        flag.style.bottom = (staffHeight - flag.clientHeight) + "px";
+        flag.classList.add("fancy-wave");
+        createFireworks();
+
+        // Show educational component after flag raising
+        document.getElementById('flagInfo').style.display = 'block';
+
+        // Disable the button to prevent further interaction
+        document.getElementById(country + 'Button').disabled = true;
+        document.getElementById(country + 'Button').classList.add('disabled-button');
+
         return;
       }
     
@@ -454,6 +529,34 @@ footer a:hover {
         isFlagBeingRaised = false; // Allow flag raising again
       });
     }
+    if (localStorage.getItem(country + 'FlagRaised') || isFlagBeingRaised) {
+        console.log("Flag already raised for this session or is being raised.");
+        document.getElementById('flagInfo').style.display = 'block';
+        flag.classList.add("fancy-wave");
+        createFireworks();
+        raiseFlag('india');
+    }
+  </script>
+  <script>
+    document.getElementById('download-certificate').addEventListener('click', () => {
+        fetch('/download_certificate')
+            .then(response => {
+                if (response.status === 403) {
+                    document.getElementById('certificate-message').style.display = 'block';
+                } else {
+                    response.blob().then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = 'certificate.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    });
+                }
+            });
+    });
   </script>
 </body>
 </html>
