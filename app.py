@@ -12,6 +12,9 @@ from PIL import Image, ImageDraw, ImageFont
 from flask import Flask, render_template, jsonify, request, send_file, make_response
 from io import BytesIO
 import json
+import pygame
+import threading
+import time
 
 
 app = Flask(__name__)
@@ -42,6 +45,9 @@ def read_flag_count():
     with lock:
         with open(FILE_PATH, 'r') as file:
             return json.load(file)
+        
+data = read_flag_count()
+india_flag_count = data.get("india", 0)
 
 def update_flag_count(country):
     """Updates flag count in JSON file."""
@@ -53,7 +59,19 @@ def update_flag_count(country):
         with open(FILE_PATH, 'w') as file:
             json.dump(data, file, indent=4)
         return data
-
+def play_music_from_97_seconds():
+    """Function to play the music from the 15-second mark."""
+    # Load the MP3 file
+    pygame.mixer.init()
+    pygame.mixer.music.load("song.mp3")
+    
+    # Set the position to 15 seconds and start playing
+    pygame.mixer.music.play(start=97)
+    # Wait for 15 seconds
+    time.sleep(30)
+    
+    # Stop the music
+    pygame.mixer.music.stop()
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -169,6 +187,8 @@ def raise_flag():
 
     # Emit the updated flag count to all clients via WebSocket
     socketio.emit('update_score', updated_data)
+        # Start the music in a background thread
+    threading.Thread(target=play_music_from_97_seconds).start()
 
     return jsonify({"message": f"{country.capitalize()} flag raised!", "count": updated_data[country]})
 
@@ -189,8 +209,7 @@ def download_certificate_png():
     except Exception as e:
         print(f"Error fetching template image: {e}")
         return "Template image fetch failed"
-    data = read_flag_count()
-    india_flag_count = data.get("india", 0)
+
     # Initialize drawing context
     draw = ImageDraw.Draw(img)
 
