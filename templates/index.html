@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <title>ForNation</title>
   
   <style>
@@ -122,6 +123,11 @@
       background: rgba(255, 200, 50, 0.9);
       box-shadow: 0 0 10px rgba(255, 200, 50, 1), 0 0 20px rgba(255, 50, 50, 1);
       animation: explode 0.7s ease-out forwards;
+    }
+    .flag-raised {
+      bottom: 250px; /* Adjust this value to position the flag at the raised height */
+      transition: bottom 0.3s ease-in-out; /* Smooth transition effect */
+      animation: fancyWave 1.5s ease-in-out infinite; /* Optional: Add waving animation */
     }
 
     @keyframes explode {
@@ -355,7 +361,7 @@ footer a:hover {
 
   <div class="chatbot-container">
     <div class="chatbot-header">
-        AI Chatbot
+        AI Sentiment
     </div>
     <div id="chatbot-messages" class="chatbot-messages">
         {% for message in messages %}
@@ -369,7 +375,8 @@ footer a:hover {
     
 </div>
 <div id="certificate-section">
-  <button id="download-certificate">Download Certificate</button>
+  <button id="download-certificate" type="button" class="btn btn-outline-success" aria-label="Download Certificate">Download Certificate</button>
+
   <p id="certificate-message" style="color: rgb(0, 81, 255); display: none;">Certificate already downloaded.</p>
 </div>
 
@@ -481,7 +488,19 @@ footer a:hover {
     }
 
     let isFlagBeingRaised = false;
-
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if the flag was raised in the current session
+      const country = 'india'; // Use the country variable dynamically if needed
+      const flagRaised = localStorage.getItem(country + 'FlagRaised');
+    
+      if (flagRaised === 'true') {
+        // Add a CSS class to indicate the flag is raised
+        const flag = document.getElementById(country + 'Flag');
+        flag.classList.add('flag-raised');
+        document.getElementById('flagInfo').style.display = 'block';
+      }
+    });
+    
     function raiseFlag(country) {
       if (localStorage.getItem(country + 'FlagRaised') || isFlagBeingRaised) {
         console.log("Flag already raised for this session or is being raised.");
