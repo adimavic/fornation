@@ -3,11 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ForNation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+  <title>Digital Tiranga</title>
+  <link rel="icon" href="https://icon2.cleanpng.com/20240209/ea/transparent-flag-of-india-indias-flag-round-with-tricolor-stripes-and-1710882860515.webp" type="image/png">
+
+  
   <style>
+    
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #a0e1f2, #e0f7ff);
+      /* background: linear-gradient(to bottom, #a0e1f2, #e0f7ff); */
+      /* background-color: {{ background_color }};  */
+      background: {{ background_color }};
       display: flex;
       justify-content: center;
       align-items: center;
@@ -23,24 +32,30 @@
     }
 
     .staff {
-      width: 15px;
-      height: 350px;
-      background-color: #333;
-      position: relative;
-      border-radius: 5px;
-      border: 3px solid #222;
-    }
-    .triangle {
-      position: absolute;
-      top: -10px;  /* Adjust position to sit on top of the pole */
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 40px solid #333;  /* Color of the pole */
-      transform: translateX(-50%);
-    }
+  width: 15px;
+  height: 380px;
+  background-color: #333;
+  position: relative;
+  border-radius: 5px;
+  border: 3px solid #222;
+  margin-left: 20px; /* Add margin to the left to create a gap */
+}
+
+/* Adding a pointy top */
+.staff::before {
+    content: "";
+    position: absolute;
+    top: -15px;  /* Position the triangle at the top */
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;  /* Adjust width of the point */
+    border-right: 8px solid transparent; /* Adjust width of the point */
+    border-bottom: 20px solid #333;     /* Color of the staff to match */
+    transform: translateX(-50%);
+}
+
+
 
     .ground {
       width: 100%;
@@ -79,27 +94,141 @@
       background-image: url('https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg');
     }
 
-    @keyframes fancyWave {
-      0% {
-        transform: rotate(0deg) scale(1);
-      }
-      25% {
-        transform: rotate(-15deg) scale(1.05);
-      }
-      50% {
-        transform: rotate(10deg) scale(1.03);
-      }
-      75% {
-        transform: rotate(-10deg) scale(1.05);
-      }
-      100% {
-        transform: rotate(0deg) scale(1);
-      }
-    }
-
     .fancy-wave {
       animation: fancyWave 1.5s ease-in-out infinite;
     }
+    
+    #flagInfo {
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 100px; /* Adjusted to reduce top margin */
+  padding: 10px; /* Reduced padding to make the container more compact */
+}
+
+.timer {
+  font-weight: bold;
+  color: red;
+}
+
+#flagInfo h3 {
+  font-size: 1.3rem; /* Reduced font size */
+  color: #333;
+  margin-bottom: 10px; /* Reduced bottom margin */
+}
+
+#flagInfo ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0; /* Removed margin to reduce space between list and content */
+}
+
+#flagInfo li {
+  font-size: 1rem; /* Reduced font size */
+  color: #444;
+  margin: 5px 0; /* Reduced space between list items */
+}
+
+#flagInfo strong {
+  color: #e74c3c;
+}
+
+#flagInfo ul ul {
+  margin-left: 20px; /* Reduced left margin for nested lists */
+}
+
+#flagInfo ul ul li {
+  font-size: 0.9rem; /* Reduced font size for nested list items */
+  margin: 3px 0; /* Reduced margin between nested list items */
+}
+
+    .hand-animation {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: moveUp 2s infinite;
+      opacity: 1;
+    }
+
+    @keyframes moveUp {
+      0% {
+        transform: translateX(-50%) translateY(0);
+      }
+      50% {
+        transform: translateX(-50%) translateY(-40px);
+      }
+      100% {
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    #certificate-section {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  width: auto; /* Make the container width dynamic */
+}
+
+/* Add hover effect for buttons */
+#certificate-section .btn-primary {
+  animation: none;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#certificate-section .btn-primary:hover {
+  transform: scale(1.05);
+  background-color: #0056b3; /* Slightly darker blue */
+}
+
+/* Fancy animation for the spinner */
+#loadingSpinner {
+  animation: fancyWave 1.5s infinite;
+}
+
+@keyframes fancyWave {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-15deg) scale(1.05);
+  }
+  50% {
+    transform: rotate(10deg) scale(1.03);
+  }
+  75% {
+    transform: rotate(-10deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #certificate-section {
+    top: 10px;
+    right: 10px;
+    padding: 8px;
+    flex-direction: column; /* Stack buttons vertically on smaller screens */
+  }
+
+  #certificate-section button {
+    width: 100%; /* Full-width buttons on smaller screens */
+    margin-bottom: 10px; /* Add spacing between buttons */
+  }
+
+  #loadingSpinner {
+    margin: 0 auto; /* Center the spinner on smaller screens */
+  }
+}
+
+
 
     .firework {
       position: absolute;
@@ -109,6 +238,11 @@
       background: rgba(255, 200, 50, 0.9);
       box-shadow: 0 0 10px rgba(255, 200, 50, 1), 0 0 20px rgba(255, 50, 50, 1);
       animation: explode 0.7s ease-out forwards;
+    }
+    .flag-raised {
+      bottom: 270px; /* Adjust this value to position the flag at the raised height */
+      transition: bottom 0.3s ease-in-out; /* Smooth transition effect */
+      animation: fancyWave 1.5s ease-in-out infinite; /* Optional: Add waving animation */
     }
 
     @keyframes explode {
@@ -123,62 +257,292 @@
     }
 
     #countDisplay {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 10px 20px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensure it's above other elements */
+  transition: all 0.3s ease-in-out;
+}
+
+#countDisplay p {
+  font-size: 1rem; /* Base font size */
+  font-weight: bold;
+  color: #444;
+  text-align: center; /* Center align text */
+}
+
+#countDisplay span {
+  color: #e74c3c;
+  font-size: 1.2rem; /* Slightly larger for emphasis */
+}
+
+@media (max-width: 768px) {
+  #countDisplay {
+    top: 10px;
+    left: 10px;
+    padding: 8px 15px; /* Adjust padding for smaller screens */
+  }
+
+  #countDisplay p {
+    font-size: 0.9rem; /* Smaller font size for mobile */
+  }
+
+  #countDisplay span {
+    font-size: 1rem;
+  }
+}
+
+/* Chatbot Container */
+.chatbot-container {
+    width: 100%;
+    max-width: 350px; /* Adjust width for larger devices */
+    height: 400px; /* Increase height for better visibility */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Chatbot Messages Styling */
+.chatbot-messages {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Individual Message Styling */
+.chatbot-message {
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 576px) {
+    .chatbot-container {
+        max-width: 90%; /* Use almost full width on small screens */
+        height: 300px; /* Decrease height for compact displays */
+        bottom: 10px;
+        right: 10px;
     }
 
-    #countDisplay p {
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #444;
+    .chatbot-header {
+        font-size: 16px; /* Smaller header text for compact screens */
     }
 
-    #countDisplay span {
-      color: #e74c3c;
-      font-size: 1.4rem;
+    .chatbot-messages {
+        font-size: 12px; /* Smaller font size for messages */
+    }
+}
+
+@media (min-width: 992px) {
+    .chatbot-container {
+        bottom: 30px; /* Adjust for larger screens */
+        right: 30px;
+    }
+}
+
+
+
+footer {
+    background: linear-gradient(to bottom, #4caf50, #2e7d32); /* Gradient resembling grass colors */
+    color: #fff;
+    text-align: center;
+    padding: 1px 5px; /* Further reduce vertical padding */
+    position: fixed; /* Stick footer at the bottom */
+    bottom: 0; /* Keep footer at the very bottom */
+    left: 0; /* Ensure it starts from the left edge */
+    right: 0; /* Ensure it ends at the right edge */
+    width: 100%; /* Force it to take full width */
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: space-between; /* Space between elements */
+    align-items: center; /* Vertically center align items */
+    box-sizing: border-box; /* Include padding in total width/height */
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    margin: 0; /* Remove default margin */
+    height: auto; /* Let content determine height (optional) */
+    min-height: 20px; /* Further reduce the minimum height */
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Reduce gap between links */
+    margin: 0; /* Reset any default margins */
+    padding: 0; /* Reset any default padding */
+}
+
+.footer-links a {
+    color: #fff;
+    font-size: 12px; /* Further reduce font size */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #00bcd4; /* Change color on hover */
+}
+
+.footer-text {
+    font-size: 10px; /* Further reduce font size */
+    text-align: center;
+    flex-grow: 1;
+    margin: 0 2px; /* Reduce horizontal margins */
+}
+
+footer div:last-child {
+    margin: 0; /* Ensure no unnecessary spacing on the right */
+}
+
+footer a {
+    text-decoration: none;
+    font-size: 12px; /* Match smaller font size */
+    color: #fff;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: #00bcd4;
+}
+
+/* Mobile-Specific Adjustments */
+@media (max-width: 768px) {
+    footer {
+        flex-direction: column;
+        text-align: center;
+        padding: 5px; /* Maintain smaller padding on mobile */
     }
 
-    #flagInfo {
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin-top: 20px;
-      padding: 15px;
+    .footer-links {
+        margin: 2px 0; /* Reduce spacing between elements */
     }
-    
-    #flagInfo h3 {
-      font-size: 1.5rem;
-      color: #333;
+
+    .footer-text {
+        margin-top: 2px; /* Reduce spacing */
     }
-    
-    #flagInfo ul {
-      list-style-type: none;
-      padding: 0;
+}
+
+.highlight {
+    font-weight: bold;
+    color: #97f008; /* Bright green to make it stand out */
+    text-decoration: underline;
+}
+
+
+
+.swipe-up {
+    position: absolute; /* Position relative to the parent container */
+    bottom: 110px; /* Adjust for placement above the flag base */
+    left: calc(50% - 200px); /* Adjust left position based on the flag's location */
+    transform: translateX(0); /* Remove centering */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeUp 1.5s infinite;
+    box-sizing: border-box;
+}
+
+.swipe-up .arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid #000;
+    border-top: 2px solid #000;
+    transform: rotate(-45deg);
+    margin-bottom: 5px;
+}
+
+.swipe-up .arrow:nth-child(1) {
+    animation: bounce 1s infinite 0s;
+}
+
+.swipe-up .arrow:nth-child(2) {
+    animation: bounce 1s infinite 0.2s;
+}
+
+.swipe-up .arrow:nth-child(3) {
+    animation: bounce 1s infinite 0.4s;
+}
+
+.swipe-up span {
+    font-size: 14px;
+    color: #000;
+    text-align: center;
+}
+
+/* Keyframes for animations */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0) rotate(-45deg);
     }
-    
-    #flagInfo li {
-      font-size: 1.1rem;
-      color: #444;
-      margin: 10px 0;
+    50% {
+        transform: translateY(-10px) rotate(-45deg);
     }
-    
-    #flagInfo strong {
-      color: #e74c3c;
+}
+
+@keyframes fadeUp {
+    0% {
+        opacity: 0.5;
     }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .swipe-up {
+        bottom: 80px; /* Raise slightly for smaller screens */
+        left: calc(50% - 150px); /* Adjust closer to the flag for smaller screens */
+    }
+
+    .swipe-up .arrow {
+        width: 16px; /* Reduce size for smaller screens */
+        height: 16px;
+    }
+
+    .swipe-up span {
+        font-size: 12px; /* Reduce text size for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .swipe-up {
+        bottom: 60px; /* Further adjust for very small screens */
+        left: calc(50% - 100px); /* Closer alignment for tiny screens */
+    }
+
+    .swipe-up .arrow {
+        width: 14px; /* Even smaller arrow size */
+        height: 14px;
+    }
+
+    .swipe-up span {
+        font-size: 10px; /* Smaller font for readability */
+    }
+}
 
   </style>
 </head>
 <body>
+  <i class="bi bi-download"></i>
 
   <div class="flag-container">
+
+    <div id="swipeUpContainer">
+      <div class="swipe-up">
+        <div class="arrow"></div>
+        <div class="arrow"></div>
+        <div class="arrow"></div>
+        <span>                   </span>
+      </div>
+    </div>
     <div class="staff">
       <div class="triangle"></div> <!-- Pointed triangle -->
       <div class="ground"></div>
@@ -187,9 +551,10 @@
     </div>
   </div>
 
-  <div id="countDisplay">
-    <p>India Flag Raised: <span id="indiaCount">0</span> times</p>
+  <div id="countDisplay" class="d-flex flex-column align-items-center justify-content-center p-3 shadow-lg rounded">
+    <p>Hosted:<span id="indiaCount"></span></p>
   </div>
+  
 
   <div id="flagInfo" style="display: none; padding: 20px; background-color: #fff; margin-top: 60px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
     <h3>Learn About the Indian Flag</h3>
@@ -197,9 +562,9 @@
       <li><strong>Adopted:</strong> July 22, 1947</li>
       <li><strong>Colors Represent:</strong> 
         <ul>
-          <li><strong>Saffron:</strong> Courage and sacrifice</li>
-          <li><strong>White:</strong> Truth and peace</li>
-          <li><strong>Green:</strong> Faith and chivalry</li>
+          <li><strong>Saffron:</strong>Strength, Courage, Sacrifice</li>
+          <li><strong>White:</strong> Truth, purity</li>
+          <li><strong>Green:</strong> Faith, Growth, and Prosperity</li>
         </ul>
       </li>
       <li><strong>Symbol:</strong> The Ashoka Chakra represents the eternal wheel of law and progress</li>
@@ -207,33 +572,327 @@
     </ul>
   </div>
 
+  <!-- <div class="chatbot-container">
+    <div class="chatbot-header">
+        AI Sentiment
+    </div>
+    <div id="chatbot-messages" class="chatbot-messages">
+        {% for message in messages %}
+            <div class="chatbot-message">{{ message }}</div>
+        {% endfor %}
+    </div>
+    <form method="POST" class="chatbot-input-container">
+        <input class="chatbot-input" type="text" name="user_input" placeholder="Type how you feel 😊" required>
+        <button class="chatbot-button" type="submit">></button>
+    </form>
+    
+</div> -->
+<div id="certificate-section" class="d-flex flex-column flex-md-row align-items-center justify-content-center p-3 shadow-lg rounded">
+  <!-- Start Quiz Button -->
+  <button class="btn btn-primary mb-2 mb-md-0 me-0 me-md-2" data-bs-toggle="modal" data-bs-target="#quizModal" aria-label="Start Quiz">
+    Start Quiz
+  </button>
+  <!-- Download Certificate Button -->
+  <button id="download-certificate" type="button" class="btn btn-primary mb-2 mb-md-0 me-0 me-md-2" aria-label="Download Certificate">
+    Download Certificate
+  </button>
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="spinner-border text-primary ms-0 ms-md-2" role="status" style="display: none;">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+
+
+<!-- Quiz Modal -->
+<div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="quizModalLabel">Quiz on India</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="quizContent">
+          <p class="timer">Time left: <span id="timeLeft">10</span> seconds</p>
+          <form id="quizForm">
+            <div id="questions">
+              <!-- Questions will be dynamically added here -->
+            </div>
+            <button type="submit" class="btn btn-success mt-3" disabled id="submitButton">Submit Answer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Custom Fancy Alert Modal -->
+<div class="modal fade" id="customAlertModal" tabindex="-1" aria-labelledby="customAlertModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; background: linear-gradient(145deg, #6e7dff, #5a6bc1); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);">
+      <div class="modal-header" style="border-bottom: 2px solid #fff;">
+        <h5 class="modal-title" id="customAlertModalLabel" style="color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold;">
+          Time Alert
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="font-size: 1.4rem; text-align: center; color: #fff; font-family: 'Arial', sans-serif; padding: 20px;">
+        <p>
+          <span style="font-size: 2rem;">⏳</span> <strong>You have 60 seconds to complete the quiz!</strong> <span style="font-size: 2rem;">⏳</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Custom Fancy Alert Modal -->
+  <div class="modal fade" id="customdonwloadAlertModal" tabindex="-1" aria-labelledby="customAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border-radius: 20px; background: linear-gradient(145deg, #6e7dff, #5a6bc1); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);">
+        <div class="modal-header" style="border-bottom: 2px solid #fff;">
+          <h5 class="modal-title" id="customAlertModalLabel" style="color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold;">
+            Hosting the Digital Tiranga
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="font-size: 1.4rem; text-align: center; color: #fff; font-family: 'Arial', sans-serif; padding: 20px;">
+          <p>
+            <strong>Feel proud to raise the Indian flag and then you can download your certificate🎉!</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Name Input Modal -->
+<div class="modal" id="nameInputModal" tabindex="-1" aria-labelledby="nameInputModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nameInputModalLabel">Enter Your Name</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="userNameInput" class="form-control" placeholder="Your Name" required>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="submitNameButton" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Spinner (hidden by default) -->
+<div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
+  <span class="visually-hidden">Loading...</span>
+</div>
+
+  
+<footer>
+  <!-- LinkedIn Link -->
+  <div class="footer-links">
+    <a href="https://www.instagram.com/digital_tiranga/profilecard/?igsh=MWN0ZWxscWtmeWQ1NA%3D%3D" target="_blank" title="Instagram">
+      Instagram
+    </a>
+  </div>
+
+  <!-- Footer Text -->
+  <div class="footer-text">
+    &copy; All rights reserved by <span class="highlight">Digital Tiranga</span>
+  </div>
+
+  <!-- About Link -->
+  <div>
+    <a href="/about">About</a>
+  </div>
+</footer>
+<audio id="audioPlayer" src="http://127.0.0.1/music/song.mp3" preload="auto"></audio>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
   <script>
-    let offsetY;
-    const socket = io.connect('http://' + document.domain + ':' + location.port);
+    const questions = [
+      {
+        question: "What does the 24 spokes in the Ashoka Chakra represent?",
+        options: ["24 Hours of the Day", "24 Moral Values", "24 Ancient Sciences", "24 States in India"],
+        answer: 0,
+      },
+      {
+        question: "Who was the first Indian to win a Nobel Prize?",
+        options: ["Rabindranath Tagore", "C.V. Raman", "Mother Teresa", "Amartya Sen"],
+        answer: 0,
+      },
+      {
+        question: "Which Indian city is known as the 'Silicon Valley of India'?",
+        options: ["Mumbai", "Hyderabad", "Bangalore", "Pune"],
+        answer: 2,
+      },
+      {
+        question: "What is the highest civilian award in India?",
+        options: ["Padma Bhushan", "Padma Vibhushan", "Bharat Ratna", "Param Vir Chakra"],
+        answer: 2,
+      },
+      {
+        question: "Which animal is the national emblem of India?",
+        options: ["Tiger", "Elephant", "Peacock", "Lion"],
+        answer: 3,
+      },
+    ];
+  
+    let timeLeft = 60; // Set timer to 20 seconds
+    let timer;
+  
+    document.addEventListener("DOMContentLoaded", () => {
+      const quizForm = document.getElementById("quizForm");
+      const questionsContainer = document.getElementById("questions");
+      const submitButton = document.getElementById("submitButton");
+      const timeLeftSpan = document.getElementById("timeLeft");
+      const startQuizButton = document.querySelector('[data-bs-target="#quizModal"]');
+  
+      // Check if the user has already played the quiz
+      if (localStorage.getItem("hasPlayedQuiz")) {
+        startQuizButton.disabled = true; // Disable the "Start Quiz" button
+        startQuizButton.textContent = "Quiz Completed"; // Update button text
+      }
+  
+      // Populate the quiz questions
+      questions.forEach((q, index) => {
+        const questionHTML = `
+          <div class="mb-3">
+            <p><strong>Q${index + 1}: ${q.question}</strong></p>
+            ${q.options
+              .map(
+                (opt, i) => `
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="question${index}" id="question${index}option${i}" value="${i}">
+                <label class="form-check-label" for="question${index}option${i}">${opt}</label>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        `;
+        questionsContainer.insertAdjacentHTML("beforeend", questionHTML);
+      });
+  
+      // Start the timer when the modal is shown
+      const quizModal = document.getElementById("quizModal");
 
-    // Listen for 'update_score' event from Flask-SocketIO
-    socket.on('update_score', function(data) {
-      // Update the flag count dynamically for all clients
-      const indiaCount = data.india || 0;  // Default to 0 if no data available
-      document.getElementById('indiaCount').textContent = indiaCount;
+      quizModal.addEventListener("show.bs.modal", () => {
+        const customAlertModal = new bootstrap.Modal(document.getElementById('customAlertModal'));
+        customAlertModal.show();
+        timeLeft = 60; // Reset time to 20 seconds
+        timeLeftSpan.textContent = timeLeft;
+        submitButton.disabled = true;
+  
+        // Timer countdown
+        timer = setInterval(() => {
+          timeLeft--;
+          timeLeftSpan.textContent = timeLeft;
+          submitButton.disabled = false;
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            submitButton.disabled = false; // Enable submit button
+  
+            // Automatically close the modal and display results
+            const modal = bootstrap.Modal.getInstance(quizModal);
+            modal.hide(); // Close the modal
+  
+            // Calculate and display score
+            let score = 0;
+            questions.forEach((q, index) => {
+              const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+              if (selectedOption && parseInt(selectedOption.value) === q.answer) {
+                score++;
+              }
+            });
+  
+            // Mark the quiz as played in localStorage
+            localStorage.setItem("hasPlayedQuiz", true);
+  
+            // Show result in a nice popup
+            setTimeout(() => {
+              if (score > 0) {
+                alert(`🎉 Congratulations! You scored ${score} out of ${questions.length}!`);
+              } else {
+                alert(`😞 Oops! You scored ${score} out of ${questions.length}. Better luck next time!`);
+              }
+  
+              // Disable quiz button after completion
+              startQuizButton.disabled = true;
+              startQuizButton.textContent = "Quiz Completed";
+            }, 500); // Delay for smoother UX
+          }
+        }, 1000);
+      });
+  
+      // Stop the timer when the modal is hidden
+      quizModal.addEventListener("hide.bs.modal", () => {
+        clearInterval(timer);
+      });
+  
+      // Handle form submission
+      quizForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        clearInterval(timer);
+  
+        let score = 0;
+        questions.forEach((q, index) => {
+          const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+          if (selectedOption && parseInt(selectedOption.value) === q.answer) {
+            score++;
+          }
+        });
+  
+        // Mark the quiz as played in localStorage
+        localStorage.setItem("hasPlayedQuiz", true);
+  
+        // Show result in a nice popup
+        const modal = bootstrap.Modal.getInstance(quizModal);
+        modal.hide(); // Close the modal
+  
+        setTimeout(() => {
+          if (score > 0) {
+            alert(`🎉 Congratulations! You scored ${score} out of ${questions.length}!`);
+          } else {
+            alert(`😞 Oops! You scored ${score} out of ${questions.length}. Better luck next time!`);
+          }
+  
+          // Disable quiz button after completion
+          startQuizButton.disabled = true;
+          startQuizButton.textContent = "Quiz Completed";
+        }, 500); // Delay for smoother UX
+      });
+    });
+  </script>
+  
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let offsetY;
+    const socket = io.connect(window.location.protocol + '//' + window.location.host, {
+      transports: ['websocket'], // Enforce WebSocket usage
+      secure: true               // Required for HTTPS/WSS
     });
 
+  
+    // Listen for 'update_score' event from Flask-SocketIO
+    socket.on('update_score', function (data) {
+      const indiaCount = data.india || 497; // Default to 0 if no data available
+      document.getElementById('indiaCount').textContent = indiaCount;
+    });
+  
     function dragStart(event) {
       offsetY = event.clientY - event.target.getBoundingClientRect().top;
     }
-
+  
     function dragFlag(event) {
       const flag = event.target;
       const staff = flag.parentElement;
       const staffHeight = staff.clientHeight;
-
+  
       let newY = event.clientY - staff.getBoundingClientRect().top - offsetY;
       if (newY < 0) newY = 0;
       if (newY > staffHeight - flag.clientHeight) newY = staffHeight - flag.clientHeight;
-
+  
       flag.style.bottom = (staffHeight - newY - flag.clientHeight) + "px";
-
+  
       if (newY === 0) {
         flag.classList.add("fancy-wave");
         createFireworks();
@@ -242,7 +901,50 @@
         flag.classList.remove("fancy-wave");
       }
     }
-
+  
+    // Function to scroll the messages container to the bottom
+    function scrollToBottom() {
+      const messagesContainer = document.getElementById("chatbot-messages");
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  
+    window.onload = function () {
+  
+      // Check if the flag is already raised
+      const flag = document.getElementById('flag'); // Replace with the actual flag ID
+      const staff = flag.parentElement;
+      const staffHeight = staff.clientHeight;
+  
+      const country = 'india'; // Example for the 'india' flag
+      if (localStorage.getItem(country + 'FlagRaised')) {
+        console.log("Flag already raised for this session.");
+  
+        // Directly position the flag at the raised position
+        flag.style.bottom = (staffHeight - flag.clientHeight) + "px";
+        flag.classList.add("fancy-wave");
+        createFireworks();
+  
+        // Hide the swipe-up UI
+        document.getElementById('swipeUpContainer').style.display = 'none';
+  
+        // Show the educational component
+        document.getElementById('flagInfo').style.display = 'block';
+  
+        // Disable the button to prevent further interaction
+        const flagButton = document.getElementById(country + 'Button');
+        if (flagButton) {
+          flagButton.disabled = true;
+          flagButton.classList.add('disabled-button');
+        }
+      }
+    };
+  
+    // Call the function after form submission (e.g., after a new message is added)
+    // const form = document.querySelector('.chatbot-input-container');
+    // form.addEventListener('submit', () => {
+    //   setTimeout(scrollToBottom, 100); // Delay to allow new message to be rendered
+    // });
+  
     function createFireworks() {
       const fireworkCount = 20;
       for (let i = 0; i < fireworkCount; i++) {
@@ -254,17 +956,50 @@
         firework.addEventListener('animationend', () => firework.remove());
       }
     }
-
+  
     let isFlagBeingRaised = false;
-
+  
+    document.addEventListener('DOMContentLoaded', () => {
+      const country = 'india';
+      const flagRaised = localStorage.getItem(country + 'FlagRaised');
+  
+      if (flagRaised === 'true') {
+        const flag = document.getElementById(country + 'Flag');
+        flag.classList.add('flag-raised');
+        document.getElementById('flagInfo').style.display = 'block';
+  
+        // Hide the swipe-up UI
+        document.getElementById('swipeUpContainer').style.display = 'none';
+      }
+    });
+  
     function raiseFlag(country) {
       if (localStorage.getItem(country + 'FlagRaised') || isFlagBeingRaised) {
         console.log("Flag already raised for this session or is being raised.");
+        document.getElementById('flagInfo').style.display = 'block';
+  
+        const flag = document.getElementById('flag'); // Replace with actual flag ID
+        const staff = flag.parentElement;
+        const staffHeight = staff.clientHeight;
+  
+        flag.style.bottom = (staffHeight - flag.clientHeight) + "px";
+        flag.classList.add("fancy-wave");
+        createFireworks();
+  
+        document.getElementById('flagInfo').style.display = 'block';
+        document.getElementById('swipeUpContainer').style.display = 'none';
+  
+        document.getElementById(country + 'Button').disabled = true;
+        document.getElementById(country + 'Button').classList.add('disabled-button');
+  
+        // Hide the swipe-up UI
+        document.getElementById('swipeUpContainer').style.display = 'none';
+  
         return;
       }
-    
-      isFlagBeingRaised = true; // Set the flag to prevent repeated triggers.
-    
+  
+      isFlagBeingRaised = true;
+  
       fetch('/raise_flag', {
         method: 'POST',
         headers: {
@@ -272,20 +1007,323 @@
         },
         body: JSON.stringify({ country: country })
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.count !== undefined) {
-          document.getElementById(country + 'Count').textContent = data.count;
-          localStorage.setItem(country + 'FlagRaised', 'true');
-    
-          // Show educational component after flag raising
-          document.getElementById('flagInfo').style.display = 'block';
-        }
-      })
-      .finally(() => {
-        isFlagBeingRaised = false; // Allow flag raising again
-      });
+        .then(response => response.json())
+        .then(data => {
+          if (data.count !== undefined) {
+            document.getElementById(country + 'Count').textContent = data.count;
+            localStorage.setItem(country + 'FlagRaised', 'true');
+  
+            document.getElementById('flagInfo').style.display = 'block';
+  
+            // Hide the swipe-up UI after the flag is raised
+            document.getElementById('swipeUpContainer').style.display = 'none';
+          }
+        })
+        .finally(() => {
+          isFlagBeingRaised = false;
+        });
     }
   </script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const downloadButton = document.getElementById('download-certificate');
+      const certificateMessage = document.getElementById('certificate-message');
+      const country = 'india'; // Country for the flag (adjust as needed)
+      const loadingSpinner = document.getElementById('loadingSpinner'); // Reference to the loading spinner
+      const raiseButton = document.getElementById('raiseFlagButton');
+      
+      // Show the modal for entering name
+      function showNameInputModal() {
+        const nameInputModal = new bootstrap.Modal(document.getElementById('nameInputModal'));
+        nameInputModal.show();
+      }
+  
+      // Check if the user has already downloaded the certificate
+      if (localStorage.getItem('hasDownloadedCertificate')) {
+        downloadButton.disabled = true; // Disable the download button
+        downloadButton.textContent = 'Certificate Downloaded'; // Update button text
+        certificateMessage.style.display = 'block'; // Optionally display a message
+      }
+  
+      function showFancyAlert() {
+        const customAlertModal = new bootstrap.Modal(document.getElementById('customdonwloadAlertModal'));
+        customAlertModal.show();
+      }
+  
+      // When the download button is clicked
+      downloadButton.addEventListener('click', () => {
+        if (localStorage.getItem(country + 'FlagRaised') == 'false') {
+          showFancyAlert();
+          return; // Prevent further action if the flag is not raised
+        }
+  
+        // Show name input modal
+        showNameInputModal();
+      });
+  
+      // Event listener to handle the name input submission
+      const nameSubmitButton = document.getElementById('submitNameButton');
+      if (nameSubmitButton) {
+        nameSubmitButton.addEventListener('click', () => {
+          const userName = document.getElementById('userNameInput').value.trim(); // Get the value entered by the user
+  
+          if (!userName) {
+            alert("Please enter a valid name.");
+            return; // Don't proceed if the name is empty
+          }
+  
+          // Close the name input modal
+          const nameInputModal = bootstrap.Modal.getInstance(document.getElementById('nameInputModal'));
+          nameInputModal.hide();
+  
+          // Show loading spinner
+          loadingSpinner.style.display = 'inline-block'; 
+          downloadButton.disabled = true; // Disable the button while downloading
+  
+          // Send the name along with the download request
+          fetch('/download_certificate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_name: userName })
+          })
+          .then(response => {
+            if (response.status === 403) {
+              certificateMessage.style.display = 'block';
+            } else {
+              response.blob().then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'certificate.png';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+  
+                // Mark certificate as downloaded in localStorage
+                localStorage.setItem('hasDownloadedCertificate', true);
+  
+                // Disable the button after download
+                downloadButton.disabled = true;
+                downloadButton.textContent = 'Certificate Downloaded'; // Update button text
+  
+                // Hide the spinner after download completes
+                loadingSpinner.style.display = 'none';
+              });
+            }
+          })
+          .catch(() => {
+            // Hide the spinner if something goes wrong
+            loadingSpinner.style.display = 'none';
+            downloadButton.disabled = false; // Re-enable the button if there's an error
+          });
+        });
+      }
+  
+      // Function to raise the flag and enable the download button immediately
+      function raiseFlag(country) {
+        if (localStorage.getItem(country + 'FlagRaised')) {
+          console.log("Flag already raised for this session.");
+          return;
+        }
+  
+        fetch('/raise_flag', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ country: country })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.count !== undefined) {
+            // Flag has been raised, store this in localStorage
+            localStorage.setItem(country + 'FlagRaised', 'true');
+  
+            // Enable download button immediately after raising the flag
+            downloadButton.disabled = false;
+            downloadButton.textContent = 'Download Certificate';
+  
+            // Optionally show some UI elements for flag raise
+            document.getElementById('flagInfo').style.display = 'block';
+            document.getElementById('swipeUpContainer').style.display = 'none';
+          } else {
+            console.error('Flag raise failed.');
+          }
+        })
+        .catch((error) => {
+          console.error('Error raising flag:', error);
+        });
+      }
+  
+      // Event listener to trigger flag raising
+      if (raiseButton) {
+        raiseButton.addEventListener('click', () => {
+          raiseFlag(country); // Raise the flag when the button is clicked
+        });
+      }
+    });
+  </script>
+  
+
+
+<!-- // Touch base flag hosting here. -->
+
+<script>
+  const flag = document.querySelector('.flag');
+  const flagInfo = document.getElementById('flagInfo'); // Info page container
+  let isDragging = false;
+  let startY = 0;
+  const topPosition = 280; // Adjust this value based on your desired "top" position of the flag
+
+  // Assuming 'country' is a variable that holds the country name, for example:
+  const country = 'india'; // Replace with the actual country name
+
+  // Check localStorage on page load and set flag position accordingly
+  window.addEventListener('load', () => {
+    if (localStorage.getItem(country + 'FlagRaised') === 'true') {
+      // If the flag is raised, set its position to top and add waving class
+      flag.style.bottom = `${topPosition}px`;
+      flag.classList.add("fancy-wave");
+      flagInfo.style.display = 'block'; // Show the flag info
+    }
+  });
+
+  // Handle touch start (set isDragging to true when the drag starts)
+  flag.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    startY = e.touches[0].clientY; // Store the initial touch position
+    flag.style.transition = 'none'; // Disable transition during dragging for smooth movement
+  });
+
+// Handle touch move
+flag.addEventListener('touchmove', (e) => {
+  // Prevent default scrolling on touch
+  e.preventDefault();
+
+  // Check if the flag has already been raised
+  if (localStorage.getItem(country + 'FlagRaised') === 'true') {
+    // If the flag is already raised, prevent any movement and ensure it's at the top position
+    flag.style.bottom = `${topPosition}px`;
+    return;
+  }
+
+  // If the flag is not raised, proceed with the drag logic
+  const touchY = e.touches[0].clientY;
+  const distance = touchY - startY;
+  const currentBottom = parseInt(getComputedStyle(flag).bottom, 10) || 0;
+  const newBottom = currentBottom - distance;
+
+  // Ensure the flag doesn't go above the top position
+  
+  if (newBottom >= topPosition) {
+    flag.style.bottom = `${topPosition}px`;
+    createFireworks(); // Fireworks function
+    document.getElementById('swipeUpContainer').style.display = 'none';
+
+    // Send the count to the backend and raise the flag
+    fetch('/raise_flag', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ country: country })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.count !== undefined) {
+        // Flag has been raised, store this in localStorage
+        localStorage.setItem(country + 'FlagRaised', 'true');
+        // Enable download button immediately after raising the flag
+        downloadButton.disabled = false;
+        // downloadButton.textContent = 'Download Certificate';
+        // Optionally show some UI elements for flag raise
+        // document.getElementById('flagInfo').style.display = 'block';
+        // document.getElementById('swipeUpContainer').style.display = 'none';
+        //const audioPlayer = new Audio('http://127.0.0.1/music/song.mp3'); // Replace with your audio URL
+        //audioPlayer.currentTime = 97; // Start at 97 seconds
+        //audioPlayer.play();  // Play the audio
+      } else {
+        console.error('Flag raise failed.');
+      }
+    })
+    .catch((error) => {
+      console.error('Error raising flag:', error);
+    });
+
+    flagInfo.style.display = 'block';
+    localStorage.setItem(country + 'FlagRaised', 'true'); // Store the flag's raised state in localStorage
+    flag.classList.add("fancy-wave"); // Add fancy wave when the flag reaches the top
+  } else if (newBottom <= 0) {
+    // Prevent dragging below the ground
+    flag.style.bottom = '0px';
+  } else {
+    flag.style.bottom = `${newBottom}px`;
+  }
+
+  startY = touchY; // Update start position for smooth dragging
+});
+
+
+
+
+  // Handle touch end (reset dragging state and enable smooth transition)
+  flag.addEventListener('touchend', () => {
+    isDragging = false;
+    flag.style.transition = 'bottom 0.3s'; // Re-enable smooth transition after drag ends
+  });
+
+  // Create fireworks function
+  function createFireworks() {
+    const fireworkCount = 20;
+    for (let i = 0; i < fireworkCount; i++) {
+      const firework = document.createElement('div');
+      firework.className = 'firework';
+      firework.style.left = `${Math.random() * 100}vw`;
+      firework.style.top = `${Math.random() * 30}vh`;
+      document.body.appendChild(firework);
+      firework.addEventListener('animationend', () => firework.remove());
+    }
+  }
+</script>
+<!-- <script>
+  document.addEventListener('DOMContentLoaded', function () {
+      // Get the audio element
+      const audioPlayer = document.getElementById('audioPlayer');
+      audioPlayer.currentTime = 97; // Start from 97 seconds
+
+      // Get the flag element
+      const flag = document.getElementById('indiaFlag');
+
+      // Add event listeners for click and drag
+      flag.addEventListener('click', playAudio);
+      flag.addEventListener('dragstart', playAudio);
+
+      // Function to play the audio
+      function playAudio() {
+          // Ensure the audio is not playing already
+          if (audioPlayer.paused) {
+              console.log('Audio is starting...');
+              audioPlayer.play()
+                  .then(() => {
+                      console.log('Audio is playing from 97 seconds.');
+
+                      // Pause the audio after 20 seconds
+                      setTimeout(() => {
+                          audioPlayer.pause();
+                          console.log('Audio paused after 20 seconds.');
+                      }, 20000); // 20 seconds
+                  })
+                  .catch((error) => {
+                      console.error('Error playing audio:', error);
+                      alert('Autoplay blocked. Please try clicking the flag again.');
+                  });
+          }
+      }
+  });
+</script> -->
 </body>
 </html>
