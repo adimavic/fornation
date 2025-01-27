@@ -6,7 +6,7 @@ Here’s a well-structured and professional GitHub README template tailored for 
 
 **A seamless and reliable web hosting platform designed for effortless website management.**  
 
-![License](https://img.shields.io/badge/license-MIT-green)  
+
 ![Status](https://img.shields.io/badge/status-Live-success)  
 [![Website](https://img.shields.io/website-up-down-green-red/http/host.digitaltiranga.in.svg)](https://host.digitaltiranga.in/)
 
