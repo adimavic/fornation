@@ -1,26 +1,25 @@
 import json
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session,send_from_directory,abort
 from flask_socketio import SocketIO, emit
 from textblob import TextBlob
-import razorpay
 from threading import Lock
-from io import BytesIO
 from reportlab.pdfgen import canvas
 import json
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from flask import Flask, render_template, jsonify, request, send_file, make_response
-from io import BytesIO
 import json
 import pygame
 import threading
 import time
-
+import os
+import sys
+import secrets
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  # Required for session handling
+app.secret_key = secrets.token_hex(16) # Required for session handling
 socketio = SocketIO(app)  # Initialize Flask-SocketIO
-from threading import Lock
+
 lock = Lock()
 
 # Global list to store messages
@@ -30,35 +29,50 @@ messages = []
 MAX_MESSAGES = 100
 
 
-# File path for flag count storage
-FILE_PATH = 'flag_count.json'
-
-RAZORPAY_KEY_ID = ""
-RAZORPAY_KEY_SECRET = ""
-
-# Razorpay client initialization
-razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
-
+HOME_DIR = os.environ.get('HOME_DIR') # After setting Env. variable restart the computer
+FILE_PATH = rf"{HOME_DIR}/flag_count.json"
+certificate_path = rf"{HOME_DIR}/certificate.png"
+SONG_FOLDER = 'static/'
 
 def read_flag_count():
     """Reads flag count from JSON file."""
-    with lock:
-        with open(FILE_PATH, 'r') as file:
-            return json.load(file)
-        
+    try:
+        with lock:
+            with open(FILE_PATH, 'r') as file:
+                return json.load(file)
+    except Exception as e:
+        app.logger.error(f"Error reading file: {e}")
+        return {}
+
 data = read_flag_count()
 india_flag_count = data.get("india", 0)
 
 def update_flag_count(country):
     """Updates flag count in JSON file."""
-    data = read_flag_count()
-    if country not in data:
-        data[country] = 0
-    data[country] += 1
-    with lock:
-        with open(FILE_PATH, 'w') as file:
-            json.dump(data, file, indent=4)
+    try:
+        # Read the flag count data from the file
+        data = read_flag_count()
+        
+        # Check if the country exists in the data, otherwise set it to 0
+        if country not in data:
+            data[country] = 0
+        
+        # Increment the flag count for the given country
+        data[country] += 1
+        
+        # Write the updated data back to the JSON file
+        with lock:
+            with open(FILE_PATH, 'w') as file:
+                json.dump(data, file, indent=4)
+        
+        # Return the updated data
         return data
+    
+    except:
+        app.logger.error(f"File not found: {FILE_PATH}")
+        return {"error": "File not found."}
+
+
 def play_music_from_97_seconds():
     """Function to play the music from the 15-second mark."""
     # Load the MP3 file
@@ -141,98 +155,104 @@ def index():
         messages=messages,
     )
 
-@app.route('/support')
-def support_page():
-    return render_template("support.html", razorpay_key=RAZORPAY_KEY_ID)
-
-@app.route('/create-order', methods=['POST'])
-def create_order():
-    try:
-        amount = int(float(request.json['amount']) * 100)  # Convert to paise
-        payment_order = razorpay_client.order.create({
-            "amount": amount,  # Amount in paise
-            "currency": "INR",
-            "payment_capture": "1"
-        })
-        return jsonify({"order_id": payment_order['id']})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
-@app.route('/payment-success', methods=['POST'])
-def payment_success():
-    payment_id = request.form['razorpay_payment_id']
-    order_id = request.form['razorpay_order_id']
-    signature = request.form['razorpay_signature']
-    
-    try:
-        # Verifying payment signature
-        razorpay_client.utility.verify_payment_signature({
-            "razorpay_order_id": order_id,
-            "razorpay_payment_id": payment_id,
-            "razorpay_signature": signature
-        })
-        return "Payment successful! Thank you for the coffee! 😊", 200
-    except razorpay.errors.SignatureVerificationError:
-        return "Payment verification failed. Please try again.", 400
-
 @app.route('/raise_flag', methods=['POST'])
 def raise_flag():
     """API endpoint to raise a flag."""
-    country = request.json.get('country')
-    if country not in ['india']:
-        return jsonify({"error": "Invalid country"}), 400
+    try:
+        # Get the country from the request JSON
+        country = request.json.get('country')
 
-    # Update the flag count
-    updated_data = update_flag_count(country)
+        # Validate if 'country' is provided in the request body
+        if not country:
+            return jsonify({"error": "Country is required!"}), 400
+        
+        # Update the flag count by calling the function
+        updated_data = update_flag_count(country)
 
-    # Emit the updated flag count to all clients via WebSocket
-    socketio.emit('update_score', updated_data)
-        # Start the music in a background thread
-    threading.Thread(target=play_music_from_97_seconds).start()
+        # Emit the updated flag count to all clients via WebSocket
+        socketio.emit('update_score', updated_data)
 
-    return jsonify({"message": f"{country.capitalize()} flag raised!", "count": updated_data[country]})
+        # Return a success response with the updated count
+        return jsonify({
+            "message": f"{country.capitalize()} flag raised!", 
+            "count": updated_data[country]
+        })
+    
+    except KeyError as e:
+        # Handle any KeyError and log it
+        app.logger.error(f"KeyError: {e}")
+        return jsonify({"error": f"Key error: {e}"}), 500
+    
+    except Exception as e:
+        # Catch any other unexpected exceptions
+        app.logger.error(f"Unexpected error: {e}")
+        return jsonify({"error": "An unexpected error occurred."}), 500
 
-@app.route('/download_certificate', methods=['GET'])
+
+
+@app.route('/music/<filename>')
+def play_music(filename):
+    song_path = os.path.join(SONG_FOLDER, filename)
+    if os.path.exists(song_path):
+        return send_from_directory(SONG_FOLDER, filename)
+    else:
+        return abort(404)  # If the file is not found, return a 404 error
+
+@app.route('/download_certificate', methods=['POST'])
 def download_certificate_png():
     """Endpoint to generate and download the certificate as PNG."""
-    # Fetch the template image from the provided URL
-    template_url = "https://i.pinimg.com/736x/d7/be/5c/d7be5cfaa6cc82cbf58bfe0c3369ab8a.jpg"
-    
-    try:
-        response = requests.get(template_url)
-        if response.status_code == 200:
-            img = Image.open(BytesIO(response.content))  # Open the template image
-            img = img.resize((1080, 1080))  # Resize to Instagram post size (1080x1080)
-        else:
-            print("Unable to fetch template image!")
-            return "Template image fetch failed"
-    except Exception as e:
-        print(f"Error fetching template image: {e}")
-        return "Template image fetch failed"
+    # Get the user's name from the request body
+    data = request.get_json()
+    user_name = data.get('user_name', None)
+    # certificate_path = "certificate.png"  # Path to your existing certificate template image
 
-    # Initialize drawing context
+    # Validate input
+    if not user_name:
+        return jsonify({"error": "Name is required"}), 400
+
+    # Check if the certificate template exists
+    if not os.path.exists(certificate_path):
+        return jsonify({"error": "Certificate template not found."}), 404
+
+    # Open the existing certificate image
+    img = Image.open(certificate_path)
     draw = ImageDraw.Draw(img)
 
-    # Fonts (adjust path if needed)
+    # Load font (adjust the path to the font file as needed)
     try:
-        title_font = ImageFont.truetype("arial.ttf", 60)
-        subtitle_font = ImageFont.truetype("arial.ttf", 40)
-        text_font = ImageFont.truetype("arial.ttf", 30)
+        text_font = ImageFont.truetype("DejaVuSans.ttf", 90)
     except IOError:
-        title_font = subtitle_font = text_font = ImageFont.load_default()
+        # Fallback to default font if specified font is not available
+        print(IOError)
+        text_font = ImageFont.load_default()
 
-    # Add your customized text to the image
-    draw.text((540, 200), "Congratulations on hosting the Digital Indian Flag!", fill="black", font=text_font, anchor="mm")
-    draw.text((540, 270), f"Flag Host Count: {india_flag_count}", fill="black", font=text_font, anchor="mm")
-    draw.text((540, 340), "This is our 76th Republic Day.", fill="black", font=text_font, anchor="mm")
-    draw.text((540, 410), "#Digital Tiranga", fill="black", font=text_font, anchor="mm")
+    # Calculate text position for the user's name (you can adjust the y position)
+    text = f"{user_name}"
+    
+    # Using textbbox to calculate text dimensions
+    bbox = draw.textbbox((0, 0), text, font=text_font)
+    text_width = bbox[2] - bbox[0]  # Width of the text
+    text_height = bbox[3] - bbox[1]  # Height of the text
+    
+    # Calculate the x position (center the text horizontally)
+    x_pos = (img.width - text_width) // 2
+    # Adjust the vertical position
+    # y_pos = (img.height - text_height) // 2  # Center vertically
+    y_pos = 1100  # You can adjust this value as needed
 
-    # Save to BytesIO for download
-    buffer = BytesIO()
-    img.save(buffer, format="PNG")
-    buffer.seek(0)
+    # Add the user's name to the image
+    draw.text((x_pos, y_pos), text, fill="black", font=text_font)
 
-    return send_file(buffer, as_attachment=True, download_name="certificate.png", mimetype="image/png")
+    # Save the modified image
+    img.save("modified_certificate.png")
+
+    # Serve the newly modified image
+    return send_file("modified_certificate.png", as_attachment=True, download_name="certificate.png", mimetype="image/png")
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
 
 @socketio.on('connect')
 def handle_connect():
@@ -242,4 +262,4 @@ def handle_connect():
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=80, debug=True, allow_unsafe_werkzeug=True)
