@@ -10,6 +10,7 @@
     #---------ENVIRONMENT VARIABLES---------
     ENV DEBIAN_FRONTEND=noninteractive
     ENV HOME_DIR=/var/www/FLASKAPPS/digital
+    ENV PORT=8080
     
     #---------COPY FOLDERS---------
     COPY requirements.txt /tmp/
