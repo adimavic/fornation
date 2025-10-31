@@ -9,7 +9,6 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 from flask import Flask, render_template, jsonify, request, send_file, make_response
 import json
-import pygame
 import threading
 import time
 import os
@@ -73,19 +72,19 @@ def update_flag_count(country):
         return {"error": "File not found."}
 
 
-def play_music_from_97_seconds():
-    """Function to play the music from the 15-second mark."""
-    # Load the MP3 file
-    pygame.mixer.init()
-    pygame.mixer.music.load("song.mp3")
+# def play_music_from_97_seconds():
+#     """Function to play the music from the 15-second mark."""
+#     # Load the MP3 file
+#     pygame.mixer.init()
+#     pygame.mixer.music.load("song.mp3")
     
-    # Set the position to 15 seconds and start playing
-    pygame.mixer.music.play(start=97)
-    # Wait for 15 seconds
-    time.sleep(30)
+#     # Set the position to 15 seconds and start playing
+#     pygame.mixer.music.play(start=97)
+#     # Wait for 15 seconds
+#     time.sleep(30)
     
-    # Stop the music
-    pygame.mixer.music.stop()
+#     # Stop the music
+#     pygame.mixer.music.stop()
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -264,5 +263,6 @@ def handle_connect():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     socketio.run(app, host='0.0.0.0', port=port, debug=True, allow_unsafe_werkzeug=True)
+
 
 
