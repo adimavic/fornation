@@ -29,8 +29,8 @@ MAX_MESSAGES = 100
 
 
 HOME_DIR = os.environ.get('HOME_DIR') # After setting Env. variable restart the computer
-FILE_PATH = rf"{HOME_DIR}/flag_count.json"
-certificate_path = rf"{HOME_DIR}/certificate.png"
+FILE_PATH = rf"/flag_count.json"
+certificate_path = rf"/certificate.png"
 SONG_FOLDER = 'static/'
 
 def read_flag_count():
@@ -263,6 +263,7 @@ def handle_connect():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     socketio.run(app, host='0.0.0.0', port=port, debug=True, allow_unsafe_werkzeug=True)
+
 
 
 
